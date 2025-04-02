@@ -1,19 +1,40 @@
+name: 🚀 Build & Deploy ASP.NET Core
+
 on: push
-name: 🚀 Deploy website on push
+
 jobs:
   web-deploy:
     environment: Movie
-    name: 🎉 Deploy
-    runs-on: ubuntu-latest
+    name: 🎉 Build & Deploy
+    runs-on: windows-latest
+    
     steps:
     - name: 🚚 Get latest code
       uses: actions/checkout@v4
     
-    - name: 📂 Sync files
+    - name: ⚙️ Setup .NET 9
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+    
+    - name: 🏗️ Build & Publish
+      run: |
+        dotnet restore
+        dotnet build --configuration Release --no-restore
+        dotnet publish -c Release -o ./bin/Release/net9.0/publish --no-build
+        
+    - name: 🔍 Verify build output
+      run: ls -R ./bin/Release/net9.0/publish
+    
+    - name: 📂 Deploy to FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{ secrets.WEB_DEPLOY_SERVER }}
         username: ${{ secrets.WEB_DEPLOY_USERNAME }}
         password: ${{ secrets.WEB_DEPLOY_PASSWORD }}
         server-dir: ${{ secrets.WEB_SERVER_DIR }}
-        local-dir: ./bin/Release/net9.0/
+        local-dir: ./bin/Release/net9.0/publish/
+        exclude: |
+          **/*.pdb
+          **/*.config
+          **/*.json
