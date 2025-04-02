@@ -6,7 +6,7 @@ jobs:
   web-deploy:
     environment: Movie
     name: 🎉 Build & Deploy
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     
     steps:
     - name: 🚚 Get latest code
@@ -24,7 +24,7 @@ jobs:
         dotnet publish -c Release -o ./bin/Release/net9.0/publish --no-build
         
     - name: 🔍 Verify build output
-      run: ls -R ./bin/Release/net9.0/publish
+      run: ls -R ./bin/Release/net9.0/publish/
     
     - name: 📂 Deploy to FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
